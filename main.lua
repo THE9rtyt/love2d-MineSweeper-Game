@@ -18,9 +18,9 @@ and lastly, display them
 ]]
 
 --game setup
-local fieldX = 100
-local fieldY = 70   
-local MinesSet = 1484
+local fieldX = 25
+local fieldY = 13
+local MinesSet = 69
 local MineFlagged = 0
 local timeElapsed = 0
 local focused
