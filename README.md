@@ -17,7 +17,7 @@ simple, no frills minesweeper game to help me learn code
 
 ## Run
 - On Windows/Linux with LÖVE installed you can double-click `MineSweeper.love` to run the game.
-- alternatively, simply run love.exe, giving the game's folder as an argument
+- Alternatively, simply run love.exe, giving the game's folder as an argument
   - Example (windows):
 "C:\Program Files\LOVE\love.exe" "C:\games\MineSweeperFolder"
 - for Mac OS X and more, please refer to [LÖVE's wiki instructions](https://love2d.org/wiki/Getting_Started)
