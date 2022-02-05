@@ -9,7 +9,7 @@ simple, no frills minesweeper game to help me learn code
 - auto clearing empty sections
 - flagging
 - win/loss detection
-- when clicking on a numeber with an adequate number of flags in it's area, it will clear all non-flagged boxes
+- when clicking on a number with an adequate number of flags in it's area, it will clear all non-flagged boxes
 - timer
 
 # Installation
