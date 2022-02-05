@@ -1,9 +1,8 @@
 # love2d-MineSweeper-Game
 simple, no frills minesweeper game to help me learn code
 
-  <a href="https://github.com/THE9rtyt/love2d-MineSweeper-Game">
-    <img src="minesweeper.png" alt="minesweeper" width="625" height="360">
-  </a>
+ ![minesweeper](https://user-images.githubusercontent.com/83201905/152622870-624c71af-cb98-4a37-92dd-49ff89672a6d.png)
+
   
 ### Features:
 - auto clearing empty sections
@@ -16,12 +15,13 @@ simple, no frills minesweeper game to help me learn code
 ## Prerequisites
  - [LÖVE Game Engine](https://love2d.org/)
 
-## Run/build
-Extract the `MineSweeper.zip` into it's own folder and double-click `MineSweeper.exe` on windows
+## Build
+- Assuming you have LÖVE installed, simply run love.exe, giving the .love file as an argument
+Example (windows):
+"C:\Program Files\LOVE\love.exe" "C:\games\packagedgame.love"
 
-If you have LÖVE installed, you can simply download and run `MineSweeper.love` in Windows and Linux
-
-for Mac OS X and more, please refer to [LÖVE's wiki instructions](https://love2d.org/wiki/Getting_Started)
+## Run
+- Run the resulting executable
 
 # Usage
 ## controls:
