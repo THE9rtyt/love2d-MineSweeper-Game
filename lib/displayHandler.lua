@@ -208,7 +208,7 @@ end
 function displayHandler.drawMenu(settings_d)
     --print fieldY
     --needs to hold center of fieldY menu Location and scale w/ 3/2 digits
-    love.graphics.setColor(0.9,0.9,0.9)
+    love.graphics.setColor(0.8,0.9,0.9)
     love.graphics.rectangle("fill", 20*2+30+30+topBar,0,topBar,topBar)
     drawMenuNumber(settings_d.fieldX,-menuNumSpacing)
     drawMenuNumber(settings_d.fieldY,0)

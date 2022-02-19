@@ -24,7 +24,7 @@ function settingsLoader.load()
             fieldY = 13,
             Mines = 69,
         }
-        return settings()
+        return settings
     end
     return settings()
 end
