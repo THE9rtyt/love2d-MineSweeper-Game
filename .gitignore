@@ -52,7 +52,6 @@ dist/
 downloads/
 eggs/
 .eggs/
-lib/
 lib64/
 parts/
 sdist/
@@ -174,4 +173,5 @@ dmypy.json
 
 # Cython debug symbols
 cython_debug/
+.gitignore
 .gitignore
