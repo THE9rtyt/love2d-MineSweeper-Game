@@ -18,7 +18,7 @@ function settingsLoader.load()
     if settings then
         print('settings found!')
     else
-        print('default settings!')
+        print(' no settings found, loading default settings!')
         settings = {
             fieldX = 25,
             fieldY = 13,
