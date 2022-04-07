@@ -51,6 +51,7 @@ function love.load()
 
     --Initialize displayHandler
     local windowX, windowY = love.window.getMode()
+    
     displayHandler.init(settings,windowX,windowY)
     mouseHandler.init(settings)
 end
