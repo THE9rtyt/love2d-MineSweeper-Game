@@ -75,7 +75,7 @@ end
 
 function love.draw()
     if not status.menu then
-        displayHandler.drawTopBar(status.timeElapsed, fieldHandler.getScore(), status, fieldHandler.fieldSize())
+        displayHandler.drawTopBar(fieldHandler.getScore(), status, fieldHandler.fieldSize())
         displayHandler.drawfield(fieldHandler.getField())
     else
         displayHandler.drawMenu(settings)

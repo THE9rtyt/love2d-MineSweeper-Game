@@ -1,4 +1,4 @@
-# "C:\Program Files\LOVE\love.exe" "C:\Users\the9r\Documents\programs\GitMineSweeper\love2d-MineSweeper-Game\"
+# "C:\Program Files\LOVE\love.exe" C:\Users\the9r\Documents\programs\GitMineSweeper\love2d-MineSweeper-Game\
 
 # VSCode
 .vscode/*
@@ -173,5 +173,7 @@ dmypy.json
 
 # Cython debug symbols
 cython_debug/
+.gitignore
+.gitignore
 .gitignore
 .gitignore

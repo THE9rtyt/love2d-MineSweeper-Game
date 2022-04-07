@@ -111,7 +111,7 @@ function displayHandler.resize(X,Y)--does all the math required to make drawing 
     textScale = topBar/standard
 end
 
-function displayHandler.drawTopBar(time_s, score,status,fieldSize)--draws topbar,time,score,gamestatus
+function displayHandler.drawTopBar(score,status,fieldSize)--draws topbar,time,score,gamestatus
     --drawing top bar
     love.graphics.setColor(0.7,0.7,0.7)
     love.graphics.rectangle("fill",0,0,windowX,topBar)
@@ -120,13 +120,13 @@ function displayHandler.drawTopBar(time_s, score,status,fieldSize)--draws topbar
     love.graphics.setColor(0,0,0)
 
     local timerOffest = 0
-    if time_s >= 600 then -- tens minute digit
-        love.graphics.drawLayer(fileIs, getDigit(time_s,1,600)+1 ,0, 0, 0, textScale, textScale)
+    if status.timeElapsed >= 600 then -- tens minute digit
+        love.graphics.drawLayer(fileIs, getDigit(status.timeElapsed,1,600)+1 ,0, 0, 0, textScale, textScale)
         timerOffest = 30
     end
 
-    if time_s >= 60 then --minute digit
-        love.graphics.drawLayer(fileIs, getDigit(time_s,1,60)+1 ,timerOffest, 0, 0, textScale, textScale)
+    if status.timeElapsed >= 60 then --minute digit
+        love.graphics.drawLayer(fileIs, getDigit(status.timeElapsed,1,60)+1 ,timerOffest, 0, 0, textScale, textScale)
     else
         love.graphics.drawLayer(fileIs, 1 ,0, 0, 0, textScale, textScale)
     end
@@ -134,14 +134,14 @@ function displayHandler.drawTopBar(time_s, score,status,fieldSize)--draws topbar
     --colon for minute divider
     love.graphics.draw(textColon, 20+timerOffest, 0, 0, textScale, textScale)
 
-    if time_s >= 10 then --tens second digit
-        love.graphics.drawLayer(fileIs, math.floor(time_s%60/10-1)+2 , 20*2+timerOffest, 0, 0, textScale, textScale)
+    if status.timeElapsed >= 10 then --tens second digit
+        love.graphics.drawLayer(fileIs, math.floor(status.timeElapsed%60/10-1)+2 , 20*2+timerOffest, 0, 0, textScale, textScale)
     else
         love.graphics.drawLayer(fileIs, 1, 20*2, 0, 0, textScale, textScale)
     end
 
-    if time_s >= 1 then --ones second digit
-        love.graphics.drawLayer(fileIs, math.floor(time_s%10-1)+2 , 20*2+30+timerOffest, 0, 0, textScale, textScale)
+    if status.timeElapsed >= 1 then --ones second digit
+        love.graphics.drawLayer(fileIs, math.floor(status.timeElapsed%10-1)+2 , 20*2+30+timerOffest, 0, 0, textScale, textScale)
     else
         love.graphics.drawLayer(fileIs, 1, 20*2+30, 0, 0, textScale, textScale)
     end
