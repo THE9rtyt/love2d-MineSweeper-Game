@@ -5,6 +5,18 @@ local fieldHandler = {}
 ---------------------------------------------------------
 local field,fieldSize,flags,fieldX,fieldY,mines
 
+local AdjacentIndex = {
+    { x = -1, y = -1},
+    { x =  0, y = -1},
+    { x =  1, y = -1},
+    { x = -1, y =  0},
+    { x =  1, y =  0},
+    { x = -1, y =  1},
+    { x =  0, y =  1},
+    { x =  1, y =  1},
+
+}
+
 -------------------
 --private functions
 -------------------
@@ -134,6 +146,7 @@ function fieldHandler.generate(forceX,forceY)--the actual generator, with option
             fieldSize = fieldSize - 1
         end
     end
+    
     print("generated map")
     if forceX and forceY then
         for x = -1,1,1 do -- force the 3x3 around the first click to not have mines, always creating a 0 space
@@ -150,16 +163,20 @@ function fieldHandler.generate(forceX,forceY)--the actual generator, with option
     for x = 1,fieldX,1 do
         for y = 1,fieldY,1 do
             local mineT = 0
-            if field[x][y-1][1] then mineT = mineT + 1 end
+            for _,loc in pairs(AdjacentIndex) do
+                if field[x + loc.x][ y + loc.y][1] then mineT = mineT + 1 end
+            end
+            field[x][y][4] = mineT
+
+--[[            if field[x][y-1][1] then mineT = mineT + 1 end
             if field[x-1][y-1][1] then mineT = mineT + 1 end
             if field[x-1][y][1] then mineT = mineT + 1 end
             if field[x-1][y+1][1] then mineT = mineT + 1 end
             if field[x][y+1][1] then mineT = mineT + 1 end
             if field[x+1][y-1][1] then mineT = mineT + 1 end
             if field[x+1][y][1] then mineT = mineT + 1 end
-            if field[x+1][y+1][1] then mineT = mineT + 1 end
+            if field[x+1][y+1][1] then mineT = mineT + 1 end]]
             --print(mineT)
-            field[x][y][4] = mineT
             --holy crap this somehow works... or it doesn't.. not wait it does
         end
     end

@@ -54,6 +54,7 @@ function love.load()
     
     displayHandler.init(settings,windowX,windowY)
     mouseHandler.init(settings)
+    print(status.inPlay and not status.gameEnded)
 end
 
 function love.resize(X, Y) --activated everytime the window is resized, it then redoes all the math for love.draw so it's always displayed correctly

@@ -20,13 +20,13 @@ local menuRect = {
 -------------
 --load assets
 -------------
-local mineCube = love.graphics.newImage("/assets/mineCube.png")
-local textCube = love.graphics.newImage("/assets/textCube.png")
-local bombCube = love.graphics.newImage("/assets/bombCube.png")
-local flagCube = love.graphics.newImage("/assets/flagCube.png")
-local lost = love.graphics.newImage("/assets/lost.png")
-local win = love.graphics.newImage("/assets/win.png")
-local textColon = love.graphics.newImage("/assets/textColon.png")
+local mineCube = love.graphics.newImage("/assets/mineCube.png",{})
+local textCube = love.graphics.newImage("/assets/textCube.png",{})
+local bombCube = love.graphics.newImage("/assets/bombCube.png",{})
+local flagCube = love.graphics.newImage("/assets/flagCube.png",{})
+local lost = love.graphics.newImage("/assets/lost.png",{})
+local win = love.graphics.newImage("/assets/win.png",{})
+local textColon = love.graphics.newImage("/assets/textColon.png",{})
 local numbers = {
 "/assets/text0.png",
 "/assets/text1.png",
@@ -135,13 +135,13 @@ function displayHandler.drawTopBar(score,status,fieldSize)--draws topbar,time,sc
     love.graphics.draw(textColon, 20+timerOffest, 0, 0, textScale, textScale)
 
     if status.timeElapsed >= 10 then --tens second digit
-        love.graphics.drawLayer(fileIs, math.floor(status.timeElapsed%60/10-1)+2 , 20*2+timerOffest, 0, 0, textScale, textScale)
+        love.graphics.drawLayer(fileIs, math.floor(status.timeElapsed%60/10)+1 , 20*2+timerOffest, 0, 0, textScale, textScale)
     else
         love.graphics.drawLayer(fileIs, 1, 20*2, 0, 0, textScale, textScale)
     end
 
-    if status.timeElapsed >= 1 then --ones second digit
-        love.graphics.drawLayer(fileIs, math.floor(status.timeElapsed%10-1)+2 , 20*2+30+timerOffest, 0, 0, textScale, textScale)
+    if status.timeElapsed >= 0 then --ones second digit
+        love.graphics.drawLayer(fileIs, math.floor(status.timeElapsed%10)+1 , 20*2+30+timerOffest, 0, 0, textScale, textScale)
     else
         love.graphics.drawLayer(fileIs, 1, 20*2+30, 0, 0, textScale, textScale)
     end
@@ -164,7 +164,7 @@ function displayHandler.drawTopBar(score,status,fieldSize)--draws topbar,time,sc
     if score >=10 then --tens digit
         love.graphics.drawLayer(fileIs, getDigit(score,10)+1 , windowX-30*1-standard*textScale, 0, 0, textScale, textScale)
     end
-    if score >=1  then --ones digit
+    if score >=0  then --ones digit
         love.graphics.drawLayer(fileIs, getDigit(score,1)+1 , windowX-standard*textScale, 0, 0, textScale, textScale)
     end
 

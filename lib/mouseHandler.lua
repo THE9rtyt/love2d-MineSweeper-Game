@@ -88,9 +88,7 @@ function mouseHandler.mousePress(x,y, button,status)
         elseif button == 3 then
             print("middle click!")
             fieldHandler.resetField()
-            status.gameEnded = false
-            status.clicked = false
-            status.timeElapsed = 0
+            status.resetNeeded = true
         else
             if not status.gameEnded then --Game is not ended
                 if not status.clicked then -- is the field hasn't been clicked
