@@ -25,6 +25,7 @@ local mouseHandler   = require('lib.mouseHandler')
 local status = {
     clicked = false,
     gameEnded = false,
+    win = false,
     inPlay = false,
     timeElapsed = 0,
     menu = false,

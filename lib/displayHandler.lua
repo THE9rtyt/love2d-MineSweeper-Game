@@ -169,7 +169,7 @@ function displayHandler.drawTopBar(score,status,fieldSize)--draws topbar,time,sc
     end
 
     if status.gameEnded then --win image
-        if fieldSize == 0 then
+        if status.win then
             love.graphics.draw(win, windowX/2 - 85*textScale, 0, 0, textScale, textScale)
         else
         --lost image

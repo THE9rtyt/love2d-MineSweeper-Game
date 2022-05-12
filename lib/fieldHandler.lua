@@ -14,7 +14,6 @@ local AdjacentIndex = {
     { x = -1, y =  1},
     { x =  0, y =  1},
     { x =  1, y =  1},
-
 }
 
 -------------------
@@ -33,14 +32,16 @@ local function mineHit() --uncovers all bombs
 end
 
 local function clear(X,Y)-- clears spaces around a "0" space that just got cleared, it calls itself creating a recursive function that i'm quite proud works at all.
-    for x = -1,1,1 do                                   --begin search of left square
-        for y = -1,1,1 do                               --begin search of top,left square
-            if not field[X+x][Y+y][3] then              -- if not flagged
-                if field[X+x][Y+y][2] then              -- if it is covered
-                    field[X+x][Y+y][2] = false          --uncover
-                    fieldSize = fieldSize - 1           --remove fieldSize counter
-                    if field[X+x][Y+y][4] == 0 then     -- it is text space of 0
-                        clear(X+x,Y+y)                  --recursive function
+    
+    for x = -1,1,1 do                         --begin search of left square
+        for y = -1,1,1 do                     --begin search of top,left square
+            local space = field[X+x][Y+y]     --define temp variable for quicker table look up
+            if not space[3] then              -- if not flagged
+                if space[2] then              -- if it is covered
+                    space[2] = false          --uncover
+                    fieldSize = fieldSize - 1 --remove fieldSize counter
+                    if space[4] == 0 then     -- it is text space of 0
+                        clear(X+x,Y+y)        --recursion
                     end
                 end
             end
@@ -50,11 +51,9 @@ end
 
 local function clearNum(X,Y) --clears spaces around a number, and doesn't remove flags
     local flagCount = 0
-    for x = -1,1,1 do --counts flags around Number
-        for y = -1,1,1 do
-            if field[X+x][Y+y][3] then
-                flagCount = flagCount + 1
-            end
+    for _,loc in pairs(AdjacentIndex) do
+        if field[X + loc.x][ Y + loc.y][3] then
+            flagCount = flagCount + 1
         end
     end
     print("flags:" .. flagCount)
@@ -62,14 +61,15 @@ local function clearNum(X,Y) --clears spaces around a number, and doesn't remove
         --print('flags good')
         for x = -1,1,1 do
             for y = -1,1,1 do
-                if not field[X+x][Y+y][3] then
-                    if field[X+x][Y+y][2] then
-                        field[X+x][Y+y][2] = false
+                local space = field[X+x][Y+y] --define temp variable for quicker table look up and reduved stack buildup
+                if not space[3] then
+                    if space[2] then
+                        space[2] = false
                         fieldSize = fieldSize - 1
-                        if field[X+x][Y+y][1] then
+                        if space[1] then
                             mineHit()
                             return true --send back mine hit
-                        elseif field[X+x][Y+y][4] == 0 then
+                        elseif space[4] == 0 then
                             clear(X+x,Y+y)
                         end
                     end
@@ -167,47 +167,37 @@ function fieldHandler.generate(forceX,forceY)--the actual generator, with option
                 if field[x + loc.x][ y + loc.y][1] then mineT = mineT + 1 end
             end
             field[x][y][4] = mineT
-
---[[            if field[x][y-1][1] then mineT = mineT + 1 end
-            if field[x-1][y-1][1] then mineT = mineT + 1 end
-            if field[x-1][y][1] then mineT = mineT + 1 end
-            if field[x-1][y+1][1] then mineT = mineT + 1 end
-            if field[x][y+1][1] then mineT = mineT + 1 end
-            if field[x+1][y-1][1] then mineT = mineT + 1 end
-            if field[x+1][y][1] then mineT = mineT + 1 end
-            if field[x+1][y+1][1] then mineT = mineT + 1 end]]
-            --print(mineT)
-            --holy crap this somehow works... or it doesn't.. not wait it does
         end
     end
     print("numbers generated")
 end --end generate
 
-function fieldHandler.click(clickX,clickY,button) --manages clicks on the field and updates itself
-    local mine = false
-    if button == 1 then -- mine check, if it clicks on an uncovered it just sets the uncovered flag again and nothing changes
+function fieldHandler.click(clickData, status) --manages clicks on the field and updates itself
+    print(clickData)
+    local click = field[clickData.x][clickData.y]
+    if clickData.button == 1 then -- mine check, if it clicks on an uncovered it just sets the uncovered flag again and nothing changes
         print("left click!")
-        if not field[clickX][clickY][3] then --if not flagged
-            if not field[clickX][clickY][1] then --if it's not a mine
-                if field[clickX][clickY][2] then -- if it is covered
-                    field[clickX][clickY][2] = false
+        if not click[3] then --if not flagged
+            if not click[1] then --if it's not a mine
+                if click[2] then -- if it is covered
+                    click[2] = false
                     fieldSize = fieldSize - 1
-                    if field[clickX][clickY][4] == 0 then --if it's empty and covered run clear()
-                        clear(clickX,clickY)
+                    if click[4] == 0 then --if it's empty and covered run clear()
+                        clear(clickData.x,clickData.y)
                     end
-                elseif field[clickX][clickY][4] then -- not covered and text > 0
-                    mine = clearNum(clickX,clickY)
+                elseif click[4] then -- not covered and text > 0
+                    status.gameEnded = clearNum(clickData.x,clickData.y)
                 end
             else
                 mineHit()
-                mine = true
+                status.gameEnded = true
             end
         end
-    elseif button == 2 then --simply flips the flag to true
+    elseif clickData.button == 2 then --simply flips the flag to true
         print("right click!")
-        if field[clickX][clickY][2] then
-            field[clickX][clickY][3] = not field[clickX][clickY][3]
-            if field[clickX][clickY][3] then
+        if click[2] then
+            click[3] = not click[3]
+            if click[3] then
                 flags = flags + 1
             else
                 flags = flags - 1
@@ -215,10 +205,9 @@ function fieldHandler.click(clickX,clickY,button) --manages clicks on the field 
         end
     end
     if fieldSize == 0 then 
-        return true 
-    else
-        return mine
+        status.win = true
     end
+    return status
 end
 
 return fieldHandler

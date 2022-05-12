@@ -96,7 +96,7 @@ function mouseHandler.mousePress(x,y, button,status)
                     fieldHandler.generate()
                     status.inPlay = true --begin play
                 end
-                status.gameEnded = fieldHandler.click(clickX,clickY,button)
+                status = fieldHandler.click({x = clickX,y = clickY,button = button}, status)
             end
         end
     end
