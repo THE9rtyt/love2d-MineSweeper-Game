@@ -111,7 +111,7 @@ function displayHandler.resize(X,Y)--does all the math required to make drawing 
     textScale = topBar/standard
 end
 
-function displayHandler.drawTopBar(score,status,fieldSize)--draws topbar,time,score,gamestatus
+function displayHandler.drawTopBar(score,status)--draws topbar,time,score,gamestatus
     --drawing top bar
     love.graphics.setColor(0.7,0.7,0.7)
     love.graphics.rectangle("fill",0,0,windowX,topBar)

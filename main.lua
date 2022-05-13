@@ -29,7 +29,8 @@ local status = {
     inPlay = false,
     timeElapsed = 0,
     menu = false,
-    resetNeeded = false
+    resetNeeded = false,
+    flagMode = false
 }
 
 local settings
@@ -38,10 +39,12 @@ function love.load()
     status = {
         clicked = false,
         gameEnded = false,
+        win = false,
         inPlay = false,
         timeElapsed = 0,
         menu = false,
-        resetNeeded = false
+        resetNeeded = false,
+        flagMode = false
     }
     
     settings = settingsLoader.load()
@@ -78,7 +81,7 @@ end
 
 function love.draw()
     if not status.menu then
-        displayHandler.drawTopBar(fieldHandler.getScore(), status, fieldHandler.fieldSize())
+        displayHandler.drawTopBar(fieldHandler.getScore(), status)
         displayHandler.drawfield(fieldHandler.getField())
     else
         displayHandler.drawMenu(settings)
@@ -87,6 +90,7 @@ end
 
 function love.mousepressed(x, y, button, istouch)
     status = mouseHandler.mousePress(x,y,button,status)
+    print(status.win)
     if status.resetNeeded then
         settingsLoader.save(settings)
         love.load()

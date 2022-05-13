@@ -32,10 +32,10 @@ end
 -------------------
 --private function
 -------------------
-local function findRow(clickLocation,rowArray,fieldLength)
-    for ArrayLook = 0,fieldLength,1 do
-        if clickLocation < (rowArray[ArrayLook]+displayHandler.getCubeWidth()) then
-            return ArrayLook
+local function findRow(clickLocation,rowArray)
+    for Row,value in pairs(rowArray) do
+        if clickLocation < (value+displayHandler.getCubeWidth()) then
+            return Row
         end
     end --this function should never get to the end of this loop
     return 0 -- in the event it makes it here, we give it a number that will make it do nothing
@@ -54,8 +54,8 @@ end
 ----------------------------------------
 function mouseHandler.mousePress(x,y, button,status)
     print("click X:" .. x .. " Y:" .. y .. " button:" .. button)
-    local clickX = findRow(x,rowsX,fieldX)
-    local clickY = findRow(y,rowsY,fieldY)
+    local clickX = findRow(x,rowsX)
+    local clickY = findRow(y,rowsY)
     print("click X:" .. clickX .. " Y:" .. clickY)
     if status.menu then
         if clickY == 0 and y <= topBar then

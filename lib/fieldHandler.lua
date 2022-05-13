@@ -58,7 +58,7 @@ local function clearNum(X,Y) --clears spaces around a number, and doesn't remove
     end
     print("flags:" .. flagCount)
     if flagCount >= field[X][Y][4] then
-        --print('flags good')
+        --printf('flags good')
         for x = -1,1,1 do
             for y = -1,1,1 do
                 local space = field[X+x][Y+y] --define temp variable for quicker table look up and reduved stack buildup
@@ -96,20 +96,12 @@ function fieldHandler.fieldInit(settings)
     print("fieldHandler Intialized!")
 end
 
-function fieldHandler.getFlags()
-    return flags
-end
-
 function fieldHandler.getField()
     return field
 end
 
 function fieldHandler.getScore()
     return (mines-flags)
-end
-
-function fieldHandler.fieldSize()
-    return fieldSize
 end
 
 ----------------------------------
@@ -126,7 +118,6 @@ function fieldHandler.resetField()--generates a field of size X,Y and a border
             else
             field[x][y] = {false, true, false, 8}--{not mine, covered, not flagged, 8}
             end
-            --print(field[x][y][1], field[x][y][2], field[x][y][3], field[x][y][4])
         end
     end
     return field
@@ -138,12 +129,11 @@ function fieldHandler.generate(forceX,forceY)--the actual generator, with option
     local tempMines = mines
     for x = 1,fieldX,1 do
         for y = 1,fieldY,1 do
-            print( "field:" .. fieldSize .. "  mines:" .. tempMines)
+            fieldSize = fieldSize - 1
             field[x][y][1] = randomMine(fieldSize, tempMines)
             if field[x][y][1] then
                 tempMines = tempMines - 1
             end
-            fieldSize = fieldSize - 1
         end
     end
     
@@ -160,6 +150,7 @@ function fieldHandler.generate(forceX,forceY)--the actual generator, with option
         end 
     end
     fieldSize = (fieldX*fieldY)-mines
+    print("fieldSize:"..fieldSize)
     for x = 1,fieldX,1 do
         for y = 1,fieldY,1 do
             local mineT = 0
@@ -173,9 +164,8 @@ function fieldHandler.generate(forceX,forceY)--the actual generator, with option
 end --end generate
 
 function fieldHandler.click(clickData, status) --manages clicks on the field and updates itself
-    print(clickData)
     local click = field[clickData.x][clickData.y]
-    if clickData.button == 1 then -- mine check, if it clicks on an uncovered it just sets the uncovered flag again and nothing changes
+    if clickData.button == 1  and not status.flagMode then -- mine check, if it clicks on an uncovered it just sets the uncovered flag again and nothing changes
         print("left click!")
         if not click[3] then --if not flagged
             if not click[1] then --if it's not a mine
@@ -193,7 +183,7 @@ function fieldHandler.click(clickData, status) --manages clicks on the field and
                 status.gameEnded = true
             end
         end
-    elseif clickData.button == 2 then --simply flips the flag to true
+    elseif clickData.button == 2 or status.flagMode then --simply flips the flag to true
         print("right click!")
         if click[2] then
             click[3] = not click[3]
@@ -205,6 +195,7 @@ function fieldHandler.click(clickData, status) --manages clicks on the field and
         end
     end
     if fieldSize == 0 then 
+        status.gameEnded = true
         status.win = true
     end
     return status
