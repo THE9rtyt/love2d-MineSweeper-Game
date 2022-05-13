@@ -5,6 +5,12 @@ local fieldHandler = {}
 ---------------------------------------------------------
 local field,fieldSize,flags,fieldX,fieldY,mines
 
+local spaceDefault = {
+    mine = false,
+    covered = true,
+    flagged = false,
+    8}--{not mine, covered, flagged, 8}
+
 local AdjacentIndex = {
     { x = -1, y = -1},
     { x =  0, y = -1},
@@ -23,8 +29,8 @@ local function mineHit() --uncovers all bombs
     print('yeah rip')
     for x = 1,fieldX,1 do
         for y = 1,fieldY,1 do
-            if field[x][y][1] then -- finds mines and uncovers them
-                field[x][y] = {true, false, true, 0}
+            if field[x][y].mine then -- finds mines and uncovers them
+                field[x][y].covered = false
                 print("Boom!")
             else end
         end
@@ -36,11 +42,11 @@ local function clear(X,Y)-- clears spaces around a "0" space that just got clear
     for x = -1,1,1 do                         --begin search of left square
         for y = -1,1,1 do                     --begin search of top,left square
             local space = field[X+x][Y+y]     --define temp variable for quicker table look up
-            if not space[3] then              -- if not flagged
-                if space[2] then              -- if it is covered
-                    space[2] = false          --uncover
+            if not space.flagged then              -- if not flagged
+                if space.covered then              -- if it is covered
+                    space.covered = false          --uncover
                     fieldSize = fieldSize - 1 --remove fieldSize counter
-                    if space[4] == 0 then     -- it is text space of 0
+                    if space.number == 0 then     -- it is text space of 0
                         clear(X+x,Y+y)        --recursion
                     end
                 end
@@ -52,24 +58,24 @@ end
 local function clearNum(X,Y) --clears spaces around a number, and doesn't remove flags
     local flagCount = 0
     for _,loc in pairs(AdjacentIndex) do
-        if field[X + loc.x][ Y + loc.y][3] then
+        if field[X + loc.x][ Y + loc.y].flagged then
             flagCount = flagCount + 1
         end
     end
     print("flags:" .. flagCount)
-    if flagCount >= field[X][Y][4] then
+    if flagCount >= field[X][Y].number then
         --printf('flags good')
         for x = -1,1,1 do
             for y = -1,1,1 do
                 local space = field[X+x][Y+y] --define temp variable for quicker table look up and reduved stack buildup
-                if not space[3] then
-                    if space[2] then
-                        space[2] = false
+                if not space.flagged then
+                    if space.covered then
+                        space.covered = false
                         fieldSize = fieldSize - 1
-                        if space[1] then
+                        if space.mine then
                             mineHit()
                             return true --send back mine hit
-                        elseif space[4] == 0 then
+                        elseif space.number == 0 then
                             clear(X+x,Y+y)
                         end
                     end
@@ -81,7 +87,7 @@ local function clearNum(X,Y) --clears spaces around a number, and doesn't remove
 end
 
 local function randomMine(size, mines)
-    return love.math.random(1,size+mines) <= mines
+    return love.math.random(1,size+mines) <= size
 end
 
 
@@ -113,10 +119,13 @@ function fieldHandler.resetField()--generates a field of size X,Y and a border
     for x = 0,fieldX+1,1 do
         field[x] = {}
         for y = 0,fieldY+1,1 do
+            field[x][y]  = {
+                mine = false,
+                covered = true,
+                flagged = false,
+                number = 8}
             if (x == 0 or y == 0) or (x > fieldX or y > fieldY) then
-                field[x][y] = {false, false, false, 8}--{not mine, not covered, flagged, 8}
-            else
-            field[x][y] = {false, true, false, 8}--{not mine, covered, not flagged, 8}
+                field[x][y].covered = false
             end
         end
     end
@@ -130,8 +139,8 @@ function fieldHandler.generate(forceX,forceY)--the actual generator, with option
     for x = 1,fieldX,1 do
         for y = 1,fieldY,1 do
             fieldSize = fieldSize - 1
-            field[x][y][1] = randomMine(fieldSize, tempMines)
-            if field[x][y][1] then
+            field[x][y].mine = randomMine(fieldSize, tempMines)
+            if field[x][y].mine then
                 tempMines = tempMines - 1
             end
         end
@@ -141,8 +150,8 @@ function fieldHandler.generate(forceX,forceY)--the actual generator, with option
     if forceX and forceY then
         for x = -1,1,1 do -- force the 3x3 around the first click to not have mines, always creating a 0 space
             for y = -1,1,1 do
-                if field[forceX+x][forceY+y][1] then
-                    field[forceX+x][forceY+y][1] = false
+                if field[forceX+x][forceY+y].mine then
+                    field[forceX+x][forceY+y].mine = false
                     mines = mines - 1
                     print("removing mines")
                 end
@@ -155,9 +164,9 @@ function fieldHandler.generate(forceX,forceY)--the actual generator, with option
         for y = 1,fieldY,1 do
             local mineT = 0
             for _,loc in pairs(AdjacentIndex) do
-                if field[x + loc.x][ y + loc.y][1] then mineT = mineT + 1 end
+                if field[x + loc.x][ y + loc.y].mine then mineT = mineT + 1 end
             end
-            field[x][y][4] = mineT
+            field[x][y].number = mineT
         end
     end
     print("numbers generated")
@@ -167,15 +176,15 @@ function fieldHandler.click(clickData, status) --manages clicks on the field and
     local click = field[clickData.x][clickData.y]
     if clickData.button == 1  and not status.flagMode then -- mine check, if it clicks on an uncovered it just sets the uncovered flag again and nothing changes
         print("left click!")
-        if not click[3] then --if not flagged
-            if not click[1] then --if it's not a mine
-                if click[2] then -- if it is covered
-                    click[2] = false
+        if not click.flagged then --if not flagged
+            if not click.mine then --if it's not a mine
+                if click.covered then -- if it is covered
+                    click.covered = false
                     fieldSize = fieldSize - 1
-                    if click[4] == 0 then --if it's empty and covered run clear()
+                    if click.number == 0 then --if it's empty and covered run clear()
                         clear(clickData.x,clickData.y)
                     end
-                elseif click[4] then -- not covered and text > 0
+                elseif click.number then -- not covered and text > 0
                     status.gameEnded = clearNum(clickData.x,clickData.y)
                 end
             else
@@ -185,9 +194,9 @@ function fieldHandler.click(clickData, status) --manages clicks on the field and
         end
     elseif clickData.button == 2 or status.flagMode then --simply flips the flag to true
         print("right click!")
-        if click[2] then
-            click[3] = not click[3]
-            if click[3] then
+        if click.covered then
+            click.flagged = not click.flagged
+            if click.flagged then
                 flags = flags + 1
             else
                 flags = flags - 1

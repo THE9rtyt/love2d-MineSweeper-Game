@@ -184,20 +184,20 @@ function displayHandler.drawfield(field)--draws the field
             love.graphics.setColor(0,0,0)
             love.graphics.rectangle("line", rowsX[x], rowsY[y], cubeWidth, cubeWidth)
             love.graphics.setColor(1,1,1)
-            if field[x][y][2] == true then --check if covered
+            if field[x][y].covered then --check if covered
                 --print("boop X:" .. rowsX[x] .. "  Y:" .. rowsY[y])
                 love.graphics.draw(mineCube, rowsX[x], rowsY[y], 0, cubeScale, cubeScale)
-                if field[x][y][3] then --check if flagged, will not draw if it's not covered
+                if field[x][y].flagged then --check if flagged, will not draw if it's not covered
                     love.graphics.draw(flagCube, rowsX[x], rowsY[y], 0, cubeScale, cubeScale)
                 else 
                 end
             else 
-                if field[x][y][1] then --exploded bomb
+                if field[x][y].mine then --exploded bomb
                     love.graphics.draw(bombCube, rowsX[x], rowsY[y], 0, cubeScale, cubeScale)
                 else --text
                     love.graphics.draw(textCube, rowsX[x], rowsY[y], 0, cubeScale, cubeScale)
-                    if field[x][y][4] ~= 0 then
-                        love.graphics.drawLayer(fileIs, field[x][y][4]+1, rowsX[x], rowsY[y], 0, cubeScale, cubeScale)
+                    if field[x][y].number > 0 then
+                        love.graphics.drawLayer(fileIs, field[x][y].number+1, rowsX[x], rowsY[y], 0, cubeScale, cubeScale)
                     end
                 end
             end
