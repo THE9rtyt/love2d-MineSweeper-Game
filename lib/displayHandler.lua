@@ -5,7 +5,9 @@ local displayHandler = {}
 local cubeWidth,cubeScale,textScale,windowX,windowY,fieldX,fieldY
 local rowsX = {}
 local rowsY = {}
+local topBarMenuItems = {}
 local topBar = 70 -- width of top menu bar
+local timerOffset = 0
 local standard = 101--the standard size of an asset image in pixels
 local menuSize = 1.2*standard
 local menuScale = menuSize/standard --scale for menu numbers and stuff
@@ -46,7 +48,7 @@ print("assets loaded")
 --------------------
 
 function displayHandler.GetWindowInfo() --so the mouseHandler can 
-    return rowsX,rowsY,topBar,windowX,windowY,menuRect,menuNumSpacing
+    return rowsX,rowsY,topBar,windowX,windowY,menuRect,menuNumSpacing,topBarMenuItems
 end
 
 function displayHandler.getCubeWidth()
@@ -67,6 +69,7 @@ end
 
 local function getDigit(num,place, multiplier)
     if not multiplier then multiplier = 1 end
+    if not place then place = 1 end
     return math.floor(num%(place*10*multiplier)/(place*multiplier))
 end
 
@@ -109,6 +112,16 @@ function displayHandler.resize(X,Y)--does all the math required to make drawing 
     end
     cubeScale = (cubeWidth)/standard
     textScale = topBar/standard
+
+    topBarMenuItems = {
+        clock = 20*2+30+30+topBar+timerOffset,
+        settings = 20*2+30+30+topBar+timerOffset+topBar,
+        spacer1 = windowX/2-topBar/2,
+        flagMode = windowX/2+topBar/2,
+        spacer2 = windowX - 170-topBar,
+        reset = windowX - 170,
+        score = windowX
+    }
 end
 
 function displayHandler.drawTopBar(score,status)--draws topbar,time,score,gamestatus
@@ -119,53 +132,51 @@ function displayHandler.drawTopBar(score,status)--draws topbar,time,score,gamest
     --drawing timer
     love.graphics.setColor(0,0,0)
 
-    local timerOffest = 0
+    if timerOffset == 0 and status.timeElapsed >= 600 then
+        timerOffset = 30
+    end
+
+    --colon for minute divider
+    love.graphics.draw(textColon, 20+timerOffset, 0, 0, textScale, textScale)
+
     if status.timeElapsed >= 600 then -- tens minute digit
         love.graphics.drawLayer(fileIs, getDigit(status.timeElapsed,1,600)+1 ,0, 0, 0, textScale, textScale)
-        timerOffest = 30
     end
 
     if status.timeElapsed >= 60 then --minute digit
-        love.graphics.drawLayer(fileIs, getDigit(status.timeElapsed,1,60)+1 ,timerOffest, 0, 0, textScale, textScale)
+        love.graphics.drawLayer(fileIs, getDigit(status.timeElapsed,1,60)+1 ,timerOffset, 0, 0, textScale, textScale)
     else
         love.graphics.drawLayer(fileIs, 1 ,0, 0, 0, textScale, textScale)
     end
 
-    --colon for minute divider
-    love.graphics.draw(textColon, 20+timerOffest, 0, 0, textScale, textScale)
-
     if status.timeElapsed >= 10 then --tens second digit
-        love.graphics.drawLayer(fileIs, math.floor(status.timeElapsed%60/10)+1 , 20*2+timerOffest, 0, 0, textScale, textScale)
+        love.graphics.drawLayer(fileIs, getDigit(status.timeElapsed,10)+1 , 20*2+timerOffset, 0, 0, textScale, textScale)
     else
         love.graphics.drawLayer(fileIs, 1, 20*2, 0, 0, textScale, textScale)
     end
 
     if status.timeElapsed >= 0 then --ones second digit
-        love.graphics.drawLayer(fileIs, math.floor(status.timeElapsed%10)+1 , 20*2+30+timerOffest, 0, 0, textScale, textScale)
+        love.graphics.drawLayer(fileIs, getDigit(status.timeElapsed,1)+1 , 20*2+30+timerOffset, 0, 0, textScale, textScale)
     else
         love.graphics.drawLayer(fileIs, 1, 20*2+30, 0, 0, textScale, textScale)
     end
 
     --making settings button
     love.graphics.setColor(0.9,0.9,0.9)
-    love.graphics.rectangle("fill", 20*2+30+30+topBar,0,topBar,topBar)
+    love.graphics.rectangle("fill", topBarMenuItems.settings-topBar,0,topBar,topBar)
 
     --making reset button
     love.graphics.setColor(0.9,0.9,0.9)
-    love.graphics.rectangle("fill", 20*2+30+30+topBar,0,topBar,topBar)
+    love.graphics.rectangle("fill", topBarMenuItems.reset-topBar,0,topBar,topBar)
 
     love.graphics.setColor(0,0,0)
 
 
     --print(score)
-    if score >= 100 then -- hundreds digit
-        love.graphics.drawLayer(fileIs, getDigit(score,100)+1 , windowX-30*2-standard*textScale, 0, 0, textScale, textScale)
-    end
-    if score >=10 then --tens digit
-        love.graphics.drawLayer(fileIs, getDigit(score,10)+1 , windowX-30*1-standard*textScale, 0, 0, textScale, textScale)
-    end
-    if score >=0  then --ones digit
-        love.graphics.drawLayer(fileIs, getDigit(score,1)+1 , windowX-standard*textScale, 0, 0, textScale, textScale)
+    for _,v in pairs({100,10,1}) do
+        if score >= v then -- hundreds digit
+            love.graphics.drawLayer(fileIs, getDigit(score,v)+1 , windowX-math.log(v,10)*30-standard*textScale, 0, 0, textScale, textScale)
+        end
     end
 
     if status.gameEnded then --win image
@@ -175,8 +186,16 @@ function displayHandler.drawTopBar(score,status)--draws topbar,time,score,gamest
         --lost image
         love.graphics.draw(lost, windowX/2 - 85*textScale, 0, 0, textScale, textScale)
         end
+    else
+        if status.flagMode then
+            love.graphics.setColor(1.0,1.0,1.0)
+        else
+            love.graphics.setColor(0.5,0.5,0.5)
+        end
+        love.graphics.draw(flagCube, topBarMenuItems.flagMode-topBar, 0, 0, textScale, textScale)
     end
-end
+
+end --displayHandler.drawTopBar()
 
 function displayHandler.drawfield(field)--draws the field
     for x = 1,fieldX,1 do --draw field
@@ -203,16 +222,16 @@ function displayHandler.drawfield(field)--draws the field
             end
         end
     end
-end
+end --displayHandler.drawfield()
 
-function displayHandler.drawMenu(settings_d)
+function displayHandler.drawMenu(settings)
     --print fieldY
     --needs to hold center of fieldY menu Location and scale w/ 3/2 digits
     love.graphics.setColor(0.8,0.9,0.9)
-    love.graphics.rectangle("fill", 20*2+30+30+topBar,0,topBar,topBar)
-    drawMenuNumber(settings_d.fieldX,-menuNumSpacing)
-    drawMenuNumber(settings_d.fieldY,0)
-    drawMenuNumber(settings_d.Mines,menuNumSpacing)
+    love.graphics.rectangle("fill", topBarMenuItems.settings-topBar,0,topBar,topBar)
+    drawMenuNumber(settings.fieldX,-menuNumSpacing)
+    drawMenuNumber(settings.fieldY,0)
+    drawMenuNumber(settings.Mines,menuNumSpacing)
 end
 
 return displayHandler

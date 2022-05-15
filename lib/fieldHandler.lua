@@ -87,7 +87,7 @@ local function clearNum(X,Y) --clears spaces around a number, and doesn't remove
 end
 
 local function randomMine(size, mines)
-    return love.math.random(1,size+mines) <= size
+    return love.math.random(1,size+mines) <= mines
 end
 
 
@@ -174,7 +174,7 @@ end --end generate
 
 function fieldHandler.click(clickData, status) --manages clicks on the field and updates itself
     local click = field[clickData.x][clickData.y]
-    if clickData.button == 1  and not status.flagMode then -- mine check, if it clicks on an uncovered it just sets the uncovered flag again and nothing changes
+    if clickData.button == 1  and (not status.flagMode or (click.number > 0 and not click.covered)) then -- mine check, if it clicks on an uncovered it just sets the uncovered flag again and nothing changes
         print("left click!")
         if not click.flagged then --if not flagged
             if not click.mine then --if it's not a mine

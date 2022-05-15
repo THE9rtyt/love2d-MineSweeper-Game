@@ -55,10 +55,10 @@ function love.load()
 
     --Initialize displayHandler
     local windowX, windowY = love.window.getMode()
-    
     displayHandler.init(settings,windowX,windowY)
+
+    --Initialize mouseHandler
     mouseHandler.init(settings)
-    print(status.inPlay and not status.gameEnded)
 end
 
 function love.resize(X, Y) --activated everytime the window is resized, it then redoes all the math for love.draw so it's always displayed correctly
@@ -90,7 +90,6 @@ end
 
 function love.mousepressed(x, y, button, istouch)
     status = mouseHandler.mousePress(x,y,button,status)
-    print(status.win)
     if status.resetNeeded then
         settingsLoader.save(settings)
         love.load()
