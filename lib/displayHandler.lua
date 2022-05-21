@@ -8,7 +8,7 @@ local rowsY = {}
 local topBarMenuItems = {}
 local topBar = 70 -- width of top menu bar
 local timerOffset = 0
-local standard = 101--the standard size of an asset image in pixels
+local standard = 101 --the standard size of an asset image in pixels
 local menuSize = 1.2*standard
 local menuScale = menuSize/standard --scale for menu numbers and stuff
 local numberSpace = 19*menuScale --calc pixels for number spacing in menu
@@ -53,6 +53,10 @@ end
 
 function displayHandler.getCubeWidth()
     return cubeWidth
+end
+
+function displayHandler.getTopBarItems()
+    return topBarMenuItems
 end
 
 function displayHandler.init(settings,X,Y)--load field settings into display handler for field size
@@ -114,13 +118,13 @@ function displayHandler.resize(X,Y)--does all the math required to make drawing 
     textScale = topBar/standard
 
     topBarMenuItems = {
-        clock = 20*2+30+30+topBar+timerOffset,
-        settings = 20*2+30+30+topBar+timerOffset+topBar,
-        spacer1 = windowX/2-topBar/2,
-        flagMode = windowX/2+topBar/2,
-        spacer2 = windowX - 170-topBar,
-        reset = windowX - 170,
-        score = windowX
+        windowX/2 - topBar*2,   --clock     Index 1
+        windowX/2 - topBar,     --setting   Index 2
+        windowX/2 - topBar/2,   --spacer1   Index 3
+        windowX/2 + topBar/2,   --flagMode  Index 4
+        windowX/2 + topBar,     --spacer2   Index 5
+        windowX/2 + topBar*2,   --reset     Index 6
+        windowX                 --score     Index 7
     }
 end
 
@@ -143,31 +147,20 @@ function displayHandler.drawTopBar(score,status)--draws topbar,time,score,gamest
         love.graphics.drawLayer(fileIs, getDigit(status.timeElapsed,1,600)+1 ,0, 0, 0, textScale, textScale)
     end
 
-    if status.timeElapsed >= 60 then --minute digit
-        love.graphics.drawLayer(fileIs, getDigit(status.timeElapsed,1,60)+1 ,timerOffset, 0, 0, textScale, textScale)
-    else
-        love.graphics.drawLayer(fileIs, 1 ,0, 0, 0, textScale, textScale)
-    end
+    love.graphics.drawLayer(fileIs, getDigit(status.timeElapsed,1,60)+1 ,timerOffset, 0, 0, textScale, textScale)
 
-    if status.timeElapsed >= 10 then --tens second digit
-        love.graphics.drawLayer(fileIs, getDigit(status.timeElapsed,10)+1 , 20*2+timerOffset, 0, 0, textScale, textScale)
-    else
-        love.graphics.drawLayer(fileIs, 1, 20*2, 0, 0, textScale, textScale)
-    end
+    love.graphics.drawLayer(fileIs, getDigit(status.timeElapsed%60,10)+1 , 20*2+timerOffset, 0, 0, textScale, textScale)
 
-    if status.timeElapsed >= 0 then --ones second digit
-        love.graphics.drawLayer(fileIs, getDigit(status.timeElapsed,1)+1 , 20*2+30+timerOffset, 0, 0, textScale, textScale)
-    else
-        love.graphics.drawLayer(fileIs, 1, 20*2+30, 0, 0, textScale, textScale)
-    end
+    love.graphics.drawLayer(fileIs, getDigit(status.timeElapsed,1)+1 , 20*2+30+timerOffset, 0, 0, textScale, textScale)
+
 
     --making settings button
     love.graphics.setColor(0.9,0.9,0.9)
-    love.graphics.rectangle("fill", topBarMenuItems.settings-topBar,0,topBar,topBar)
+    love.graphics.rectangle("fill", topBarMenuItems[2]-topBar,0,topBar,topBar)
 
     --making reset button
     love.graphics.setColor(0.9,0.9,0.9)
-    love.graphics.rectangle("fill", topBarMenuItems.reset-topBar,0,topBar,topBar)
+    love.graphics.rectangle("fill", topBarMenuItems[6]-topBar,0,topBar,topBar)
 
     love.graphics.setColor(0,0,0)
 
@@ -192,7 +185,7 @@ function displayHandler.drawTopBar(score,status)--draws topbar,time,score,gamest
         else
             love.graphics.setColor(0.5,0.5,0.5)
         end
-        love.graphics.draw(flagCube, topBarMenuItems.flagMode-topBar, 0, 0, textScale, textScale)
+        love.graphics.draw(flagCube, topBarMenuItems[4]-topBar, 0, 0, textScale, textScale)
     end
 
 end --displayHandler.drawTopBar()
@@ -228,7 +221,7 @@ function displayHandler.drawMenu(settings)
     --print fieldY
     --needs to hold center of fieldY menu Location and scale w/ 3/2 digits
     love.graphics.setColor(0.8,0.9,0.9)
-    love.graphics.rectangle("fill", topBarMenuItems.settings-topBar,0,topBar,topBar)
+    love.graphics.rectangle("fill", topBarMenuItems[2]-topBar,0,topBar,topBar)
     drawMenuNumber(settings.fieldX,-menuNumSpacing)
     drawMenuNumber(settings.fieldY,0)
     drawMenuNumber(settings.Mines,menuNumSpacing)

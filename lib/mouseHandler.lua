@@ -13,20 +13,6 @@ local rowsX = {}
 local rowsY = {}
 local topBar,windowX,windowY,fieldX,fieldY,menuRect,menuNumSpacing
 
-local topBarMenuItems = {}
-
-local topBarMenuItemsKeys = { "clock", "settings", "spacer1", "flagMode", "spacer2", "reset", "score"}
-local topBarMenuItemsIndex = {
-    clock = 0,
-    settings = 1,
-    spacer1 = 0,
-    flagMode = 2,
-    spacer2 = 0,
-    reset = 3,
-    score = 0
-}
-
-
 --------------
 -- I/O Methods
 --------------
@@ -34,7 +20,7 @@ function mouseHandler.init(settings)--load field settings into display handler f
     fieldX = settings.fieldX
     fieldY = settings.fieldY
     --mouseHandler tags off of math that the displayHandler does
-    rowsX,rowsY,topBar,windowX,windowY,menuRect,menuNumSpacing,topBarMenuItems = displayHandler.GetWindowInfo()
+    rowsX,rowsY,topBar,windowX,windowY,menuRect,menuNumSpacing = displayHandler.GetWindowInfo()
     print("mouseHandler Intialized!")
 end
 
@@ -51,16 +37,16 @@ local function findRow(clickLocation,rowArray)
 end
 
 local function findBarItem(clickX)
-    for _,key in pairs(topBarMenuItemsKeys) do
-        if clickX < topBarMenuItems[key] then
-            return topBarMenuItemsIndex[key]
+    for Index,key in pairs(displayHandler.getTopBarItems()) do
+        if clickX < key then
+            return Index --see displayHandler topBarMenuItems var for Index info
         end
     end
     return 0
 end
 
 local function limit(var,change)
-    if var+change > 99 or 1 > var+change then
+    if var+change > 99 or var+change < 1 then
         return var
     else
         return var+change
@@ -78,8 +64,9 @@ function mouseHandler.mousePress(x,y, button,status)
     local clickY = findRow(y,rowsY)
     print("click X:" .. clickX .. " Y:" .. clickY)
     if status.menu then
-        if clickY == 0 and y <= topBar then
-            if x < (topBarMenuItems.settings) and x> 170 then--settings button hit
+        if y <= topBar then
+            local hit = findBarItem(x)
+            if hit == 2  then--settings button hit
                 print('settingsHit!')
                 status.menu = false
                 status.resetNeeded = true
@@ -91,13 +78,12 @@ function mouseHandler.mousePress(x,y, button,status)
     else --game view
         if y <= topBar then --top bar hit
             local hit = findBarItem(x)
-            print(hit)
-            if hit == 1 then
+            if hit == 2 then
                 print('settingsHit!')
                 status.menu = true
-            elseif hit == 2 then
+            elseif hit == 4 then
                 status.flagMode = not status.flagMode
-            elseif hit == 3 then
+            elseif hit == 6 then
                 print('resetHit!')
                 fieldHandler.resetField()
                 status.gameEnded = false
@@ -115,7 +101,11 @@ function mouseHandler.mousePress(x,y, button,status)
             if not status.gameEnded then --Game is not ended
                 if not status.clicked then -- is the field hasn't been clicked
                     status.clicked = true --it has now been clicked
-                    fieldHandler.generate()
+                    if status.forceEmpty then
+                        fieldHandler.generate(clickX,clickY)
+                    else
+                        fieldHandler.generate()
+                    end
                     status.inPlay = true --begin play
                 end
                 status = fieldHandler.click({x = clickX,y = clickY,button = button}, status)

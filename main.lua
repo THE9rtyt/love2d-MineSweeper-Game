@@ -22,16 +22,7 @@ local fieldHandler = require('lib.fieldHandler')
 local displayHandler = require('lib.displayHandler')
 local mouseHandler   = require('lib.mouseHandler')
 
-local status = {
-    clicked = false,
-    gameEnded = false,
-    win = false,
-    inPlay = false,
-    timeElapsed = 0,
-    menu = false,
-    resetNeeded = false,
-    flagMode = false
-}
+local status = {}
 
 local settings
 
@@ -44,9 +35,10 @@ function love.load()
         timeElapsed = 0,
         menu = false,
         resetNeeded = false,
-        flagMode = false
+        flagMode = false,
+        forceEmpty = true
     }
-    
+
     settings = settingsLoader.load()
     status.resetNeeded = false
     --game setup

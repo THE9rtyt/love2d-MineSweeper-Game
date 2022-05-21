@@ -5,12 +5,6 @@ local fieldHandler = {}
 ---------------------------------------------------------
 local field,fieldSize,flags,fieldX,fieldY,mines
 
-local spaceDefault = {
-    mine = false,
-    covered = true,
-    flagged = false,
-    8}--{not mine, covered, flagged, 8}
-
 local AdjacentIndex = {
     { x = -1, y = -1},
     { x =  0, y = -1},
@@ -38,9 +32,8 @@ local function mineHit() --uncovers all bombs
 end
 
 local function clear(X,Y)-- clears spaces around a "0" space that just got cleared, it calls itself creating a recursive function that i'm quite proud works at all.
-    
-    for x = -1,1,1 do                         --begin search of left square
-        for y = -1,1,1 do                     --begin search of top,left square
+    for x = -1,1,1 do                         --begin search at left square
+        for y = -1,1,1 do                     --begin search at top,left square
             local space = field[X+x][Y+y]     --define temp variable for quicker table look up
             if not space.flagged then              -- if not flagged
                 if space.covered then              -- if it is covered
@@ -62,7 +55,7 @@ local function clearNum(X,Y) --clears spaces around a number, and doesn't remove
             flagCount = flagCount + 1
         end
     end
-    print("flags:" .. flagCount)
+    --print("flags:" .. flagCount)
     if flagCount >= field[X][Y].number then
         --printf('flags good')
         for x = -1,1,1 do
@@ -133,44 +126,38 @@ function fieldHandler.resetField()--generates a field of size X,Y and a border
 end
 
 function fieldHandler.generate(forceX,forceY)--the actual generator, with options for placing a forced empty square
-    love.math.setRandomSeed(love.math.random(0,10000))
-    fieldSize = fieldX*fieldY
-    local tempMines = mines
-    for x = 1,fieldX,1 do
-        for y = 1,fieldY,1 do
-            fieldSize = fieldSize - 1
-            field[x][y].mine = randomMine(fieldSize, tempMines)
-            if field[x][y].mine then
-                tempMines = tempMines - 1
-            end
-        end
-    end
-    
-    print("generated map")
-    if forceX and forceY then
-        for x = -1,1,1 do -- force the 3x3 around the first click to not have mines, always creating a 0 space
-            for y = -1,1,1 do
-                if field[forceX+x][forceY+y].mine then
-                    field[forceX+x][forceY+y].mine = false
-                    mines = mines - 1
-                    print("removing mines")
+    repeat
+        fieldSize = fieldX*fieldY
+        local tempMines = mines --tracker for how many mines haven't been generated
+        for x = 1,fieldX,1 do
+            for y = 1,fieldY,1 do
+                fieldSize = fieldSize - 1
+                field[x][y].mine = randomMine(fieldSize, tempMines)
+                if field[x][y].mine then
+                    tempMines = tempMines - 1
                 end
             end
-        end 
-    end
-    fieldSize = (fieldX*fieldY)-mines
-    print("fieldSize:"..fieldSize)
-    for x = 1,fieldX,1 do
-        for y = 1,fieldY,1 do
-            local mineT = 0
-            for _,loc in pairs(AdjacentIndex) do
-                if field[x + loc.x][ y + loc.y].mine then mineT = mineT + 1 end
-            end
-            field[x][y].number = mineT
         end
-    end
-    print("numbers generated")
-end --end generate
+        mines = mines - tempMines
+
+        print("generated map")
+
+        fieldSize = (fieldX*fieldY)-mines
+        print("fieldSize:"..fieldSize)
+        for x = 1,fieldX,1 do
+            for y = 1,fieldY,1 do
+                local mineT = 0
+                for _,loc in pairs(AdjacentIndex) do
+                    if field[x + loc.x][ y + loc.y].mine then mineT = mineT + 1 end
+                end
+                field[x][y].number = mineT
+            end
+        end
+
+        print("numbers generated")
+        
+    until((not (forceX and forceY)) or (field[forceX][forceY].number == 0 and not field[forceX][forceY].mine))
+end --fieldHandler.generate()
 
 function fieldHandler.click(clickData, status) --manages clicks on the field and updates itself
     local click = field[clickData.x][clickData.y]
