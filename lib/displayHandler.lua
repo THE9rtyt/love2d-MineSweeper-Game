@@ -48,15 +48,11 @@ print("assets loaded")
 --------------------
 
 function displayHandler.GetWindowInfo() --so the mouseHandler can 
-    return rowsX,rowsY,topBar,windowX,windowY,menuRect,menuNumSpacing,topBarMenuItems
+    return topBar
 end
 
 function displayHandler.getCubeWidth()
     return cubeWidth
-end
-
-function displayHandler.getTopBarItems()
-    return topBarMenuItems
 end
 
 function displayHandler.init(settings,X,Y)--load field settings into display handler for field size
@@ -65,6 +61,47 @@ function displayHandler.init(settings,X,Y)--load field settings into display han
     displayHandler.resize(X,Y)
     love.graphics.setBackgroundColor(.5,.5,.5)
     print("displayHandler Intialized!")
+end
+
+function displayHandler.findRows(clickX,clickY) --this exists just for the mouseHandler
+    for Row,value in pairs(rowsX) do
+        if clickX < (value+cubeWidth) then
+            clickX = Row
+            break
+        end
+    end --this function should never get to the end of this loop
+
+    for Row,value in pairs(rowsY) do
+        if clickY < (value+cubeWidth) then
+            clickY = Row
+            break
+        end
+    end
+    return clickX,clickY -- in the event it makes it here, we give it a number that will make it do nothing
+end
+
+function displayHandler.findBarItem(clickX)
+    for Index,key in pairs(topBarMenuItems) do
+        if clickX < key then
+            print(Index, key)
+            return Index --see displayHandler topBarMenuItems var for Index info
+        end
+    end
+    return 0
+end
+
+function displayHandler.findMenuNum(clickX,clickY)
+    if clickY > windowY/2-menuRect.y/2 and clickY < windowY/2+menuRect.y/2 then
+        if clickX > windowX/2-menuRect.x/2-menuNumSpacing and clickX < windowX/2+menuRect.x/2-menuNumSpacing then
+            return "fieldX"
+        end
+        if clickX > windowX/2-menuRect.x/2 and clickX < windowX/2+menuRect.x/2 then
+            return "fieldY"
+        end
+        if clickX > windowX/2-menuRect.x/2+menuNumSpacing and clickX < windowX/2+menuRect.x/2+menuNumSpacing then
+            return "Mines"
+        end
+    end
 end
 
 -------------------
@@ -118,12 +155,12 @@ function displayHandler.resize(X,Y)--does all the math required to make drawing 
     textScale = topBar/standard
 
     topBarMenuItems = {
-        windowX/2 - topBar*2,   --clock     Index 1
-        windowX/2 - topBar,     --setting   Index 2
+        windowX/2 - topBar*3,   --clock     Index 1
+        windowX/2 - topBar*2,   --setting   Index 2
         windowX/2 - topBar/2,   --spacer1   Index 3
         windowX/2 + topBar/2,   --flagMode  Index 4
-        windowX/2 + topBar,     --spacer2   Index 5
-        windowX/2 + topBar*2,   --reset     Index 6
+        windowX/2 + topBar*2,   --spacer2   Index 5
+        windowX/2 + topBar*3,   --reset     Index 6
         windowX                 --score     Index 7
     }
 end
