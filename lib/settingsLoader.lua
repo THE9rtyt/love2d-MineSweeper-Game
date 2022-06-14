@@ -23,6 +23,7 @@ function settingsLoader.load()
             fieldX = 25,
             fieldY = 13,
             Mines = 69,
+            forceEmpty = true,
         }
         return settings
     end

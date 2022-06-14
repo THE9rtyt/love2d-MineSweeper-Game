@@ -1,0 +1,60 @@
+warning: LF will be replaced by CRLF in main.lua.
+The file will have its original line endings in your working directory
+[1mdiff --git a/lib/displayHandler.lua b/lib/displayHandler.lua[m
+[1mindex 808e509..a23b22a 100644[m
+[1m--- a/lib/displayHandler.lua[m
+[1m+++ b/lib/displayHandler.lua[m
+[36m@@ -173,15 +173,12 @@[m [mfunction displayHandler.drawTopBar(score,status)--draws topbar,time,score,gamest[m
+     --drawing timer[m
+     love.graphics.setColor(0,0,0)[m
+ [m
+[31m-    if timerOffset == 0 and status.timeElapsed >= 600 then[m
+[31m-        timerOffset = 30[m
+[31m-    end[m
+[31m-[m
+     --colon for minute divider[m
+     love.graphics.draw(textColon, 20+timerOffset, 0, 0, textScale, textScale)[m
+ [m
+     if status.timeElapsed >= 600 then -- tens minute digit[m
+         love.graphics.drawLayer(fileIs, getDigit(status.timeElapsed,1,600)+1 ,0, 0, 0, textScale, textScale)[m
+[32m+[m[32m        timerOffset = 30[m
+     end[m
+ [m
+     love.graphics.drawLayer(fileIs, getDigit(status.timeElapsed,1,60)+1 ,timerOffset, 0, 0, textScale, textScale)[m
+[1mdiff --git a/lib/settingsLoader.lua b/lib/settingsLoader.lua[m
+[1mindex 3df5f07..e995e03 100644[m
+[1m--- a/lib/settingsLoader.lua[m
+[1m+++ b/lib/settingsLoader.lua[m
+[36m@@ -23,6 +23,7 @@[m [mfunction settingsLoader.load()[m
+             fieldX = 25,[m
+             fieldY = 13,[m
+             Mines = 69,[m
+[32m+[m[32m            forceEmpty = true,[m
+         }[m
+         return settings[m
+     end[m
+[1mdiff --git a/main.lua b/main.lua[m
+[1mindex 3d62bff..3713326 100644[m
+[1m--- a/main.lua[m
+[1m+++ b/main.lua[m
+[36m@@ -27,6 +27,7 @@[m [mlocal status = {}[m
+ local settings[m
+ [m
+ function love.load()[m
+[32m+[m[32m    settings = settingsLoader.load()[m
+     status = {[m
+         clicked = false,[m
+         gameEnded = false,[m
+[36m@@ -36,11 +37,9 @@[m [mfunction love.load()[m
+         menu = false,[m
+         resetNeeded = false,[m
+         flagMode = false,[m
+[31m-        forceEmpty = true[m
+[32m+[m[32m        forceEmpty = settings.forceEmpty[m
+     }[m
+ [m
+[31m-    settings = settingsLoader.load()[m
+[31m-    status.resetNeeded = false[m
+     --game setup[m
+     fieldHandler.fieldInit(settings)[m
+     fieldHandler.resetField()[m

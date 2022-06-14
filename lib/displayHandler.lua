@@ -173,15 +173,12 @@ function displayHandler.drawTopBar(score,status)--draws topbar,time,score,gamest
     --drawing timer
     love.graphics.setColor(0,0,0)
 
-    if timerOffset == 0 and status.timeElapsed >= 600 then
-        timerOffset = 30
-    end
-
     --colon for minute divider
     love.graphics.draw(textColon, 20+timerOffset, 0, 0, textScale, textScale)
 
     if status.timeElapsed >= 600 then -- tens minute digit
         love.graphics.drawLayer(fileIs, getDigit(status.timeElapsed,1,600)+1 ,0, 0, 0, textScale, textScale)
+        timerOffset = 30
     end
 
     love.graphics.drawLayer(fileIs, getDigit(status.timeElapsed,1,60)+1 ,timerOffset, 0, 0, textScale, textScale)

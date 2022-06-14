@@ -27,6 +27,7 @@ local status = {}
 local settings
 
 function love.load()
+    settings = settingsLoader.load()
     status = {
         clicked = false,
         gameEnded = false,
@@ -36,11 +37,9 @@ function love.load()
         menu = false,
         resetNeeded = false,
         flagMode = false,
-        forceEmpty = true
+        forceEmpty = settings.forceEmpty
     }
 
-    settings = settingsLoader.load()
-    status.resetNeeded = false
     --game setup
     fieldHandler.fieldInit(settings)
     fieldHandler.resetField()
